@@ -1,25 +1,42 @@
-import { useState } from 'react';
-import BlogList from './BlogList';
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
 
 const Home = () => {
+  const [blogs, setBlogs] = useState(null);
+  const [isPending, setIsPending] = useState(true);
 
-const [blogs, setBlogs] = useState([
-    { title: 'My new website', body: 'lorem ipsum...', author: 'mario', id: 1 },
-    { title: 'Welcome party!', body: 'lorem ipsum...', author: 'yoshi', id: 2 },
-    { title: 'Web dev top tips', body: 'lorem ipsum...', author: 'mario', id: 3 }
-]);
 
-    const handleClick = (e) => {
-        
+
+  const handleDelete = (id) => {
+    const newBlogs = blogs.filter(blog => blog.id !== id);
+    setBlogs(newBlogs);
+  }
+
+
+    
+
+
+useEffect(()=> {
+
+    setTimeout(() => {
+
+   fetch('http://localhost:8000/blogs') 
+   .then(res => {return res.json();})
+   .then(data =>{
+       setBlogs(data);
+       setIsPending(false);
     }
+   )
+}, 1000);
+}, [])
 
-    return ( 
-        <div className="home">
-        <BlogList blogs = {blogs} title = "All Blogs"></BlogList>
-        </div>
+  return (
+    <div className="home">
+    {isPending && <div>Loading...</div>}
+      {blogs && <BlogList blogs={blogs} title="All Blogs" handleDelete={handleDelete} />}
+      
+    </div>
+  );
+};
 
-        
-     );
-}
- 
 export default Home;
